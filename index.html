@@ -1,0 +1,658 @@
+<index.html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adonai Import | Tienda Virtual Premium</title>
+    <style>
+        :root {
+            --primary: #40E0D0;
+            --secondary: #FF8C00;
+            --dark: #0f1111;
+            --light: #f4f7f6;
+            --card-bg: #1a1d20;
+            --text: #ffffff;
+            --border: #2a2a2a;
+            --shadow: 0 4px 15px rgba(0,0,0,0.2);
+            --offer-bg: #ff0000;
+        }
+
+        body.light-mode {
+            --dark: #ffffff;
+            --light: #0f1111;
+            --card-bg: #f9f9f9;
+            --text: #1a1d20;
+            --border: #dddddd;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --offer-bg: #d32f2f;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* BANNER CHICO CORREDIZO SUPERIOR */
+        .top-info-bar {
+            background: var(--primary);
+            color: #000;
+            height: 35px;
+            overflow: hidden;
+            position: relative;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+        }
+        .info-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s ease-in-out;
+        }
+        .info-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* NAVEGACIÓN */
+        nav {
+            background: var(--card-bg);
+            padding: 10px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary);
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+        .logo-box { display: flex; align-items: center; cursor: pointer; }
+        .logo-img { height: 45px; margin-right: 10px; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
+
+        /* BANNER PRINCIPAL */
+        .banner-carousel {
+            width: 100%; height: 350px; overflow: hidden; position: relative; box-shadow: var(--shadow);
+        }
+        .carousel-track { display: flex; width: 100%; height: 100%; transition: transform 0.8s ease-in-out; }
+        .carousel-slide {
+            min-width: 100%; height: 100%; background-size: cover; background-position: center;
+            position: relative; display: flex; align-items: center; justify-content: center; text-align: center; color: white;
+        }
+        .slide-content { background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; max-width: 600px; }
+        .slide-content h2 { margin: 0; font-size: 32px; color: var(--primary); }
+        .slide-content p { font-size: 16px; margin: 10px 0 0; color: #ccc; }
+
+        /* CATEGORÍAS */
+        .categories-bar { display: flex; justify-content: center; gap: 10px; padding: 25px 5%; overflow-x: auto; }
+        .cat-btn {
+            background: var(--card-bg); border: 1px solid var(--border); color: var(--text);
+            padding: 12px 25px; border-radius: 30px; cursor: pointer; white-space: nowrap; font-weight: 600;
+        }
+        .cat-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
+
+        /* PRODUCTOS */
+        .main-container { padding: 0 5% 40px; max-width: 1400px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        .product-card {
+            background: var(--card-bg); border-radius: 20px; padding: 20px;
+            border: 1px solid var(--border); transition: 0.3s; box-shadow: var(--shadow);
+            display: flex; flex-direction: column; position: relative;
+        }
+
+        .product-card img { 
+            width: 100%; height: 200px; object-fit: cover; border-radius: 15px; 
+            margin-bottom: 15px; cursor: zoom-in; transition: transform 0.3s;
+        }
+        .product-card img:hover { transform: scale(1.03); }
+
+        .badge-offer {
+            position: absolute; top: 15px; left: 15px;
+            background: var(--offer-bg);
+            color: white; padding: 6px 12px; border-radius: 8px;
+            font-weight: bold; font-size: 12px; z-index: 5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .product-desc { font-size: 13px; color: #aaa; margin-bottom: 15px; line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .price-tag { color: var(--primary); font-size: 20px; font-weight: bold; margin-bottom: 15px; }
+
+        .btn-add {
+            width: 100%; padding: 14px; background: var(--primary); color: #000;
+            border: none; border-radius: 12px; font-weight: 800; cursor: pointer;
+            text-transform: uppercase; transition: all 0.2s; box-shadow: 0 4px 0 #2bb5a8;
+        }
+        .btn-add:active { transform: translateY(3px); box-shadow: 0 1px 0 #2bb5a8; }
+
+        /* MODAL DE PRODUCTO */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.9); display: none; justify-content: center;
+            align-items: center; z-index: 5000; padding: 20px;
+        }
+        .modal-content {
+            background: var(--card-bg); width: 100%; max-width: 900px;
+            border-radius: 25px; display: flex; flex-wrap: wrap;
+            overflow: hidden; position: relative; border: 1px solid var(--primary);
+        }
+        .modal-img-side { flex: 1; min-width: 300px; background: #fff; display: flex; align-items: center; justify-content: center; }
+        .modal-img-side img { width: 100%; max-height: 500px; object-fit: contain; }
+        .modal-info-side { flex: 1; min-width: 300px; padding: 40px; color: var(--text); }
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer; color: var(--primary); font-weight: bold; }
+
+        /* PANEL DE PEDIDO / CARRITO */
+        #sales-panel { 
+            position: fixed; right: -450px; top: 0; width: 400px; height: 100%; 
+            background: var(--card-bg); box-shadow: -10px 0 30px rgba(0,0,0,0.5); 
+            transition: 0.4s; z-index: 2000; padding: 30px; display: flex; 
+            flex-direction: column; color: var(--text); 
+        }
+        #sales-panel.active { right: 0; }
+        
+        .cart-item {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;
+        }
+        .btn-remove-item {
+            background: none; border: 1px solid #ff4444; color: #ff4444;
+            border-radius: 5px; cursor: pointer; padding: 2px 8px; font-size: 12px;
+        }
+
+        .btn-cancel-all {
+            width: 100%; padding: 10px; background: transparent; color: #ff4444;
+            border: 1px solid #ff4444; border-radius: 10px; cursor: pointer;
+            margin-bottom: 10px; font-weight: bold; text-transform: uppercase;
+        }
+        .btn-cancel-all:hover { background: #ff4444; color: white; }
+
+        /* SECCIÓN INFERIOR: NOSOTROS / CONTACTO */
+        .footer-info {
+            background: var(--card-bg); padding: 60px 10%; margin-top: 40px;
+            border-top: 2px solid var(--primary); display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px;
+        }
+        .footer-info h3 { color: var(--primary); margin-bottom: 20px; text-transform: uppercase; }
+        .footer-info p { line-height: 1.6; color: var(--text); opacity: 0.8; font-size: 14px; }
+        .contact-item { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+
+        /* PANEL ADMIN */
+        #admin-panel { display: none; background: #ffffff; margin: 20px 5%; padding: 30px; border-radius: 20px; border: 4px solid var(--secondary); color: #1a1d20; position: relative; z-index: 1100; }
+        .admin-flex { display: flex; gap: 30px; flex-wrap: wrap; }
+        .admin-col { flex: 1; min-width: 300px; background: #f1f3f4; padding: 20px; border-radius: 15px; border: 1px solid #ccc; }
+        .admin-label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 2px solid #bdc3c7; box-sizing: border-box; }
+
+        #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 3000; }
+        #toast.show { opacity: 1; bottom: 120px; }
+
+        .wa-float { position: fixed; width: 60px; height: 60px; bottom: 25px; right: 25px; background-color: #25d366; color: #FFF; border-radius: 50px; text-align: center; font-size: 30px; box-shadow: 2px 2px 15px rgba(0,0,0,0.3); z-index: 1000; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .admin-float { position: fixed; width: 50px; height: 50px; bottom: 95px; right: 30px; background-color: var(--secondary); color: #FFF; border-radius: 50px; text-align: center; font-size: 20px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 1000; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        footer { text-align: center; padding: 30px 5%; color: gray; font-size: 12px; background: var(--dark); border-top: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div class="top-info-bar">
+    <div class="info-track" id="info-track">
+        <div class="info-slide">🚀 DELIVERY ENTREGAS EN EL DIA</div>
+        <div class="info-slide">📦 ENVIOS A TODO EL PAIS</div>
+    </div>
+</div>
+
+<nav>
+    <div class="logo-box" onclick="checkAdmin()">
+        <img src="https://i.ibb.co/27PmvPGh/image-5805a7.png" class="logo-img">
+        <div><b style="font-size: 18px; color: var(--primary);">ADONAI</b><br><small style="color: var(--secondary); font-weight: bold;">IMPORTACIONES</small></div>
+    </div>
+    <div class="nav-actions">
+        <button class="cat-btn" onclick="toggleTheme()" id="theme-toggle">🌓 Modo</button>
+        <button class="cat-btn" onclick="toggleSales()" style="background: var(--secondary); color: white;">🛒 <span id="cart-count">0</span></button>
+    </div>
+</nav>
+
+<div class="banner-carousel">
+    <div class="carousel-track" id="carousel-track"></div>
+</div>
+
+<div class="categories-bar" id="cat-nav"></div>
+
+<div class="modal-overlay" id="product-modal" onclick="closeProduct(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="closeProduct(null)">&times;</span>
+        <div class="modal-img-side" id="m-img-container"></div>
+        <div class="modal-info-side">
+            <h1 id="m-title" style="margin-top:0"></h1>
+            <p id="m-desc" style="font-size:18px; line-height:1.6; opacity:0.8"></p>
+            <div id="m-price" style="font-size:32px; color:var(--primary); font-weight:bold; margin: 20px 0"></div>
+            <button class="btn-add" id="m-add-btn" style="padding: 20px; font-size: 18px">Añadir al Carrito</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast">✅ ¡Producto añadido!</div>
+
+<div id="admin-panel">
+    <h2 style="text-align:center">⚙️ CENTRO DE EDICIÓN</h2>
+    <div class="admin-flex">
+        <div class="admin-col">
+            <h3>📦 PRODUCTO</h3>
+            <input type="hidden" id="edit-id">
+            <label class="admin-label">Nombre:</label>
+            <input type="text" id="p-name">
+            <label class="admin-label">Descripción:</label>
+            <textarea id="p-desc" rows="2"></textarea>
+            <label class="admin-label">Precio Hoy:</label>
+            <input type="number" id="p-price">
+            <label class="admin-label">Precio Anterior:</label>
+            <input type="number" id="p-old-price">
+            
+            <label class="admin-label">Imagen (Opción 1: Pegar URL):</label>
+            <input type="text" id="p-img">
+            <label class="admin-label">Imagen (Opción 2: Subir desde Celular/PC):</label>
+            <input type="file" id="p-img-file" accept="image/*" style="background: white;">
+
+            <label class="admin-label">Categoría:</label>
+            <select id="p-cat-select"></select>
+            <button id="btn-save-text" class="btn-add" style="background:#27ae60; color:white;" onclick="saveProduct()">Guardar Producto</button>
+            
+            <hr style="margin:20px 0">
+            <h3>🎨 ESTILO</h3>
+            <label class="admin-label">Color Principal de la Página:</label>
+            <input type="color" id="site-color" onchange="changeSiteColor(this.value)">
+        </div>
+        <div class="admin-col">
+            <h3>📂 CATEGORÍAS</h3>
+            <label class="admin-label">Nueva Categoría:</label>
+            <div style="display:flex; gap:5px">
+                <input type="text" id="new-cat-name" placeholder="Ej: Camping">
+                <button onclick="addCategory()" style="height:45px; background:var(--primary); border:none; border-radius:8px; cursor:pointer; padding:0 15px">Añadir</button>
+            </div>
+            <div id="admin-cat-list" style="margin-bottom:20px; font-size:13px"></div>
+            
+            <h3>🖼️ GESTIÓN CARRUSEL</h3>
+            <input type="hidden" id="edit-banner-id">
+            <label class="admin-label">Seleccionar Banner (o crear nuevo):</label>
+            <select id="b-index" onchange="loadBannerForm()">
+                <option value="new">+ Nuevo Banner</option>
+            </select>
+            <label class="admin-label">Título Principal:</label>
+            <input type="text" id="b-title">
+            <label class="admin-label">Sub-nota:</label>
+            <input type="text" id="b-desc">
+            <label class="admin-label">Imagen URL:</label>
+            <input type="text" id="b-img">
+            <div style="display:flex; gap:10px">
+                <button class="btn-add" id="btn-banner-save" style="background:var(--secondary); color:white;" onclick="saveBanner()">Guardar Banner</button>
+                <button class="btn-add" id="btn-banner-delete" style="background:red; color:white; display:none" onclick="deleteBanner()">Borrar</button>
+            </div>
+            
+            <button onclick="closeAdmin()" style="width:100%; margin-top:30px; background:red; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold">CERRAR PANEL</button>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div id="product-grid" class="grid"></div>
+</div>
+
+<div class="footer-info">
+    <div>
+        <h3>Nosotros</h3>
+        <p>En <b>Adonai Importaciones</b> nos dedicamos a traer los mejores productos de pesca, hogar y tecnología al mercado nacional, garantizando siempre la mejor relación calidad-precio.</p>
+    </div>
+    <div>
+        <h3>Quiénes Somos</h3>
+        <p>Somos una empresa familiar comprometida con la satisfacción de nuestros clientes. Nuestra misión es facilitar el acceso a productos premium con envíos rápidos y seguros a todo Paraguay.</p>
+    </div>
+    <div>
+        <h3>Contacto</h3>
+        <div class="contact-item">📍 Encarnación, Paraguay</div>
+        <div class="contact-item">📞 +595 992 275 487</div>
+        <div class="contact-item">✉️ info@adonaiimport.com</div>
+        <div class="contact-item">⏰ Lun a Sáb: 08:00 - 18:00</div>
+    </div>
+</div>
+
+<div class="admin-float" onclick="checkAdmin()">⚙️</div>
+<a href="https://wa.me/595992275487" class="wa-float" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35">
+</a>
+
+<div id="sales-panel">
+    <h2>Mi Pedido</h2>
+    <div id="cart-items" style="flex-grow:1; overflow-y:auto"></div>
+    <h3 id="total-price">Total: Gs 0</h3>
+    <button class="btn-cancel-all" onclick="cancelOrder()">❌ Cancelar Todo el Pedido</button>
+    <button class="btn-add" style="background:#25d366" onclick="sendWhatsApp()">ENVIAR POR WHATSAPP</button>
+    <button onclick="toggleSales()" style="width:100%; margin-top:10px; background:none; border:1px solid #555; color:inherit; padding:10px; border-radius:10px; cursor:pointer">Volver a la tienda</button>
+</div>
+
+<footer>© 2026 ADONAI IMPORT | <span onclick="checkAdmin()" style="cursor:pointer">Admin</span></footer>
+
+<script>
+    let categories = JSON.parse(localStorage.getItem("adonai_cats")) || ["pesca", "hogar"];
+    let banners = JSON.parse(localStorage.getItem("adonai_banners")) || [
+        {id: 1, title: "Temporada de Pesca", desc: "Equipos de alta gama", img: "https://i.postimg.cc/6qY9HvtD/Gemini-Generated-Image-i2ttqii2ttqii2tt.jpg"},
+        {id: 2, title: "Hogar y Confort", desc: "Calidad para tu casa", img: "https://i.postimg.cc/fLxWdbL1/Gemini-Generated-Image-jv8uyfjv8uyfjv8u.jpg"}
+    ];
+    let products = JSON.parse(localStorage.getItem("adonai_premium")) || [
+        {id: 1, name: "Reel Shimano FX 4000", desc: "Variada profesional. Cuerpo de grafito.", price: 285000, oldPrice: 350000, img: "https://i.ibb.co/L6S9zFp/reel.jpg", cat: "pesca"},
+        {id: 2, name: "Juego Sartenes", desc: "Antiadherente premium de 3 capas.", price: 180000, oldPrice: null, img: "https://i.ibb.co/9H3VvK4/sartenes.jpg", cat: "hogar"}
+    ];
+    let cart = []; let isAdmin = false; let currentSlide = 0; let currentInfo = 0;
+
+    // --- FUNCION COLOR DE PAGINA ---
+    function changeSiteColor(color) {
+        document.documentElement.style.setProperty('--primary', color);
+        localStorage.setItem('adonai_color', color);
+    }
+    // Cargar color guardado
+    const savedColor = localStorage.getItem('adonai_color');
+    if(savedColor) {
+        document.documentElement.style.setProperty('--primary', savedColor);
+        document.getElementById('site-color').value = savedColor;
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        localStorage.setItem('adonai_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+    if(localStorage.getItem('adonai_theme') === 'light') document.body.classList.add('light-mode');
+
+    function openProduct(id) {
+        const p = products.find(x => x.id === id);
+        document.getElementById("m-img-container").innerHTML = `<img src="${p.img}">`;
+        document.getElementById("m-title").innerText = p.name;
+        document.getElementById("m-desc").innerText = p.desc || "Sin descripción disponible.";
+        document.getElementById("m-price").innerText = "Gs " + p.price.toLocaleString();
+        document.getElementById("m-add-btn").onclick = () => { addToCart(p.id); closeProduct(null); };
+        document.getElementById("product-modal").style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeProduct(e) {
+        document.getElementById("product-modal").style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    function addToCart(id) {
+        const prod = products.find(x => x.id === id);
+        cart.push({...prod, cartId: Date.now() + Math.random()});
+        updateCartCount();
+        updateCartUI();
+        const t = document.getElementById("toast"); t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    function removeFromCart(cartId) {
+        cart = cart.filter(item => item.cartId !== cartId);
+        updateCartCount();
+        updateCartUI();
+    }
+
+    function cancelOrder() {
+        if(cart.length > 0 && confirm("¿Estás seguro de que quieres cancelar todo el pedido?")) {
+            cart = [];
+            updateCartCount();
+            updateCartUI();
+            toggleSales();
+        }
+    }
+
+    function updateCartCount() {
+        document.getElementById("cart-count").innerText = cart.length;
+    }
+
+    function updateCartUI() {
+        let total = 0; 
+        const container = document.getElementById("cart-items");
+        if(cart.length === 0) {
+            container.innerHTML = "<p style='text-align:center; opacity:0.5'>El carrito está vacío</p>";
+        } else {
+            container.innerHTML = cart.map((p) => { 
+                total += p.price; 
+                return `
+                <div class="cart-item">
+                    <div>
+                        <div style="font-weight:bold">${p.name}</div>
+                        <div style="color:var(--primary)">Gs ${p.price.toLocaleString()}</div>
+                    </div>
+                    <button class="btn-remove-item" onclick="removeFromCart(${p.cartId})">Quitar</button>
+                </div>`; 
+            }).join('');
+        }
+        document.getElementById("total-price").innerText = "Total: Gs " + total.toLocaleString();
+    }
+
+    function renderCategories() {
+        const nav = document.getElementById("cat-nav");
+        const select = document.getElementById("p-cat-select");
+        const adminList = document.getElementById("admin-cat-list");
+        nav.innerHTML = `<button class="cat-btn active" onclick="filterCat('todos', this)">Todos</button>` + 
+            categories.map(c => `<button class="cat-btn" onclick="filterCat('${c}', this)">${c.toUpperCase()}</button>`).join('');
+        select.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+        adminList.innerHTML = categories.map((c, i) => `${c} <span onclick="deleteCategory(${i})" style="color:red; cursor:pointer">[x]</span>`).join(' | ');
+    }
+
+    function addCategory() {
+        const name = document.getElementById("new-cat-name").value.toLowerCase().trim();
+        if(name && !categories.includes(name)) {
+            categories.push(name);
+            localStorage.setItem("adonai_cats", JSON.stringify(categories));
+            document.getElementById("new-cat-name").value = "";
+            renderCategories();
+        }
+    }
+
+    function deleteCategory(index) {
+        if(confirm("¿Borrar categoría? No borrará los productos.")) {
+            categories.splice(index, 1);
+            localStorage.setItem("adonai_cats", JSON.stringify(categories));
+            renderCategories();
+        }
+    }
+
+    // --- FUNCIONES CARRUSEL ---
+    function renderBanners() {
+        const track = document.getElementById("carousel-track");
+        const select = document.getElementById("b-index");
+        
+        track.innerHTML = banners.map(b => `<div class="carousel-slide" style="background-image: url('${b.img}')"><div class="slide-content"><h2>${b.title}</h2>${b.desc ? `<p>${b.desc}</p>` : ''}</div></div>`).join('');
+        
+        // Actualizar select del admin
+        let options = '<option value="new">+ Nuevo Banner</option>';
+        banners.forEach((b, i) => { options += `<option value="${i}">Banner ${i+1}: ${b.title}</option>`; });
+        select.innerHTML = options;
+    }
+
+    function loadBannerForm() {
+        const val = document.getElementById("b-index").value;
+        if(val === "new") {
+            document.getElementById("edit-banner-id").value = "";
+            document.getElementById("b-title").value = "";
+            document.getElementById("b-desc").value = "";
+            document.getElementById("b-img").value = "";
+            document.getElementById("btn-banner-delete").style.display = "none";
+        } else {
+            const b = banners[val];
+            document.getElementById("edit-banner-id").value = val;
+            document.getElementById("b-title").value = b.title;
+            document.getElementById("b-desc").value = b.desc;
+            document.getElementById("b-img").value = b.img;
+            document.getElementById("btn-banner-delete").style.display = "block";
+        }
+    }
+
+    function saveBanner() {
+        const idx = document.getElementById("edit-banner-id").value;
+        const newB = {
+            id: Date.now(),
+            title: document.getElementById("b-title").value,
+            desc: document.getElementById("b-desc").value,
+            img: document.getElementById("b-img").value
+        };
+
+        if(idx === "") {
+            banners.push(newB);
+        } else {
+            banners[idx] = newB;
+        }
+
+        localStorage.setItem("adonai_banners", JSON.stringify(banners));
+        renderBanners();
+        alert("Carrusel actualizado");
+    }
+
+    function deleteBanner() {
+        const idx = document.getElementById("edit-banner-id").value;
+        if(idx !== "" && confirm("¿Borrar este banner?")) {
+            banners.splice(idx, 1);
+            localStorage.setItem("adonai_banners", JSON.stringify(banners));
+            renderBanners();
+            loadBannerForm();
+        }
+    }
+
+    function render(list = products) {
+        const grid = document.getElementById("product-grid");
+        grid.innerHTML = list.map(p => `
+            <div class="product-card">
+                ${p.oldPrice ? `<div class="badge-offer">¡OFERTA!</div>` : ''}
+                <img src="${p.img}" onclick="openProduct(${p.id})">
+                <h3>${p.name}</h3>
+                <div class="product-desc">${p.desc || ''}</div>
+                <div style="margin-bottom:10px">
+                    ${p.oldPrice ? `<span style="text-decoration:line-through; color:red; font-size:14px; margin-right:8px">Gs ${p.oldPrice.toLocaleString()}</span>` : ''}
+                    <span class="price-tag">Gs ${p.price.toLocaleString()}</span>
+                </div>
+                <button class="btn-add" onclick="addToCart(${p.id})">Agregar</button>
+                ${isAdmin ? `<div style="margin-top:10px; font-size:12px; border-top:1px dashed #555; padding-top:10px; text-align:center">
+                    <span onclick="editP(${p.id})" style="color:orange;cursor:pointer;font-weight:bold">📝 Editar</span> | 
+                    <span onclick="deleteP(${p.id})" style="color:red;cursor:pointer;font-weight:bold">🗑️ Borrar</span>
+                </div>`:''}
+            </div>`).join('');
+    }
+
+    function deleteP(id) {
+        if(confirm("¿Eliminar este producto permanentemente?")) {
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem("adonai_premium", JSON.stringify(products));
+            render();
+        }
+    }
+
+    function editP(id) {
+        const p = products.find(x => x.id === id);
+        document.getElementById("edit-id").value = p.id;
+        document.getElementById("p-name").value = p.name;
+        document.getElementById("p-desc").value = p.desc || "";
+        document.getElementById("p-price").value = p.price;
+        document.getElementById("p-old-price").value = p.oldPrice || "";
+        document.getElementById("p-img").value = p.img;
+        document.getElementById("p-cat-select").value = p.cat;
+        document.getElementById("btn-save-text").innerText = "Actualizar Producto";
+        window.scrollTo(0,0);
+    }
+
+    async function saveProduct() {
+        const id = document.getElementById("edit-id").value;
+        const fileInput = document.getElementById("p-img-file");
+        let finalImg = document.getElementById("p-img").value;
+
+        if(fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            finalImg = await new Promise((resolve) => {
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(fileInput.files[0]);
+            });
+        }
+
+        const newP = {
+            id: id ? parseInt(id) : Date.now(),
+            name: document.getElementById("p-name").value,
+            desc: document.getElementById("p-desc").value,
+            price: parseInt(document.getElementById("p-price").value),
+            oldPrice: document.getElementById("p-old-price").value ? parseInt(document.getElementById("p-old-price").value) : null,
+            img: finalImg,
+            cat: document.getElementById("p-cat-select").value
+        };
+
+        if(id) {
+            const index = products.findIndex(p => p.id == id);
+            products[index] = newP;
+        } else {
+            products.push(newP);
+        }
+
+        localStorage.setItem("adonai_premium", JSON.stringify(products));
+        
+        document.getElementById("edit-id").value = "";
+        document.getElementById("p-name").value = "";
+        document.getElementById("p-desc").value = "";
+        document.getElementById("p-price").value = "";
+        document.getElementById("p-old-price").value = "";
+        document.getElementById("p-img").value = "";
+        document.getElementById("p-img-file").value = "";
+        document.getElementById("btn-save-text").innerText = "Guardar Producto";
+
+        render();
+        alert("¡Guardado con éxito!");
+    }
+
+    function checkAdmin() { 
+        if(prompt("Clave Admin:") === "5959") { 
+            isAdmin = true; 
+            document.getElementById("admin-panel").style.display="block"; 
+            render(); 
+            renderCategories(); 
+            renderBanners();
+        } 
+    }
+
+    function closeAdmin() { 
+        isAdmin = false; 
+        document.getElementById("admin-panel").style.display="none"; 
+        render(); 
+    }
+
+    function toggleSales() { document.getElementById("sales-panel").classList.toggle("active"); }
+    
+    function filterCat(c, btn) {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        render(c === 'todos' ? products : products.filter(p => p.cat === c));
+    }
+
+    function sendWhatsApp() {
+        if(cart.length === 0) return alert("El carrito está vacío");
+        let msg = "Hola Adonai Import, mi pedido es:\n\n";
+        cart.forEach(p => msg += `- ${p.name} (Gs ${p.price.toLocaleString()})\n`);
+        msg += `\n*Total: ${document.getElementById("total-price").innerText}*`;
+        window.open(`https://wa.me/595992275487?text=${encodeURIComponent(msg)}`);
+    }
+
+    setInterval(() => {
+        if(banners.length > 0) {
+            currentSlide = (currentSlide + 1) % banners.length;
+            const track = document.getElementById("carousel-track");
+            if(track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        currentInfo = (currentInfo + 1) % 2;
+        const infoTrack = document.getElementById("info-track");
+        if(infoTrack) infoTrack.style.transform = `translateX(-${currentInfo * 100}%)`;
+    }, 4000);
+
+    renderBanners(); renderCategories(); render(); updateCartUI();
+</script>
+</body>
+</html>
